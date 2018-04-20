@@ -292,6 +292,7 @@ function! s:HaskellSettings() abort
   if executable('hoogle')
     setlocal keywordprg=hoogle\ --info
   endif
+endfunction
 
 function! s:HaskellSortImports(line1, line2)
   exe a:line1 . "," . a:line2 . "sort /import\\s\\+\\(qualified\\s\\+\\)\\?/"
