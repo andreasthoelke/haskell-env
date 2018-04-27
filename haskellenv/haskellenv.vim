@@ -79,6 +79,12 @@ let g:haskell_supported_pragmas = [
   \ 'UNPACK',
   \ 'WARNING']
 
+let g:haskell_supported_deriving_strategies = [
+  \ 'anyclass',
+  \ 'instance',
+  \ 'newtype',
+  \ 'stock']
+
 let g:haskell_supported_keywords = [
   \ 'as',
   \ 'capi',
@@ -145,6 +151,12 @@ function! HaskellComplete(findstart, base)
       endfor
     elseif l:line =~ '^{-#\s\+$'
       for m in g:haskell_supported_pragmas
+        if m =~ '^' . a:base
+          call add(res, m)
+        endif
+      endfor
+    elseif l:line =~ 'deriving\s*$'
+      for m in g:haskell_supported_deriving_strategies
         if m =~ '^' . a:base
           call add(res, m)
         endif
