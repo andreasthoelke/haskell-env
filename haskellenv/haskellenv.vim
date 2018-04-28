@@ -35,21 +35,19 @@ if executable('hasktags')
 endif
 
 function! s:HaskellHealth(state, resolver)
-  let l:health = ''
-
   if a:state is# 'ide'
-    let l:health = '%#HaskellReadyLTS#●' . a:resolver
+    hi LanguageHealth guifg=#B8E673 guibg=#465457
   elseif a:state is# 'ready'
-    let l:health = '%#HaskellReadyLTS#' . a:resolver
+    hi LanguageHealth guifg=#B8E673 guibg=#465457
   elseif a:state is# 'initialized'
-    let l:health = '%#HaskellInitLTS#' . a:resolver
+    hi LanguageHealth guifg=#E6DB74 guibg=#465457
   elseif a:state is# 'uninitialized'
-    let l:health = '%#HaskellUninitLTS#' . a:resolver
+    hi LanguageHealth guifg=#EF5939 guibg=#465457
   elseif a:state is# 'missing'
-    let l:health = a:resolver
+    hi LanguageHealth guifg=#EF5939 guibg=#465457
   endif
-  let g:airline_section_x = airline#section#create(['filetype', ' ', l:health])
-  AirlineRefresh
+
+  let g:language_health = a:resolver
 endfunction
 
 let g:haskell_supported_extensions = []
@@ -174,10 +172,6 @@ endfunction
 set omnifunc=HaskellComplete
 
 function! s:HaskellSetup(...) abort
-  highlight HaskellUninitLTS guifg=#EF5939 guibg=#465457
-  highlight HaskellReadyLTS  guifg=#B8E673 guibg=#465457
-  highlight HaskellInitLTS   guifg=#E6DB74 guibg=#465457
-
   let g:haskell_original_path = get(g:, 'haskell_original_path', $PATH)
   let g:haskell_supported_extensions = []
 
@@ -252,6 +246,7 @@ function! s:HaskellSetup(...) abort
         return
       end
     end
+    let g:haskell_resolver = l:ghc
 
     if isdirectory(l:envpath)
       let $PATH = l:envpath . ':' . g:haskell_original_path
