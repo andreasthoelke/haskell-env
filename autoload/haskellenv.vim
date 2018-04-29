@@ -11,29 +11,6 @@ let g:haskell_indent_case_alternative = 1
 
 let g:hamlet_prevent_invalid_nesting = 0
 
-if executable('hasktags')
-  function! s:HaskellRebuildTagsFinished(job_id, data, event) abort
-    let g:haskell_rebuild_tags = 0
-  endfunction
-  let s:HaskellRebuildTagsFinishedHandler = {
-    \ 'on_exit': function('s:HaskellRebuildTagsFinished')
-    \ }
-
-  function! s:HaskellRebuildTags() abort
-    if !get(g:, 'haskell_rebuild_tags', 0)
-      let l:cmd = 'hasktags --ignore-close-implementation --ctags .; sort tags'
-      let g:haskell_rebuild_tags = jobstart(l:cmd, s:HaskellRebuildTagsFinishedHandler)
-    endif
-  endfunction
-
-  augroup haskell_tags
-    au!
-    au BufWritePost *.hs call s:HaskellRebuildTags()
-  augroup end
-
-  command! HaskTags call s:HaskellRebuildTags()
-endif
-
 function! s:HaskellHealth(state, resolver)
   if a:state is# 'ide'
     hi LanguageHealth guifg=#B8E673 guibg=#465457
@@ -311,18 +288,43 @@ function! s:HaskellFormatImport(line1, line2)
 endfunction
 command! -buffer -range HaskFormatImport call s:HaskellFormatImport(<line1>, <line2>)
 
-augroup haskellenv_commands
-  au!
-  au BufNewFile *.hs call s:HaskellSkel() | call s:HaskellSettings()
-  au BufRead *.hs call s:HaskellSettings()
-  au BufNewFile,BufRead *.dump-stg,*.dump-simpl setf haskell
-  au BufNewFile,BufRead *.dump-cmm,*.dump-opt-cmm setf c
-  au BufNewFile,BufRead *.dump-asm setf asm
-  au BufWritePost stack.yaml call s:HaskellSetup()
-augroup end
+function! haskellenv#start()
+  augroup haskellenv_commands
+    au!
+    au BufNewFile *.hs call s:HaskellSkel() | call s:HaskellSettings()
+    au BufRead *.hs call s:HaskellSettings()
+    au BufNewFile,BufRead *.dump-stg,*.dump-simpl setf haskell
+    au BufNewFile,BufRead *.dump-cmm,*.dump-opt-cmm setf c
+    au BufNewFile,BufRead *.dump-asm setf asm
+    au BufWritePost stack.yaml call s:HaskellSetup()
+  augroup end
 
-if filereadable('stack.yaml')
-  au VimEnter * call s:HaskellSetup()
-else
-  HaskEnv current
-endif
+  if executable('hasktags')
+    function! s:HaskellRebuildTagsFinished(job_id, data, event) abort
+      let g:haskell_rebuild_tags = 0
+    endfunction
+    let s:HaskellRebuildTagsFinishedHandler = {
+      \ 'on_exit': function('s:HaskellRebuildTagsFinished')
+      \ }
+
+    function! s:HaskellRebuildTags() abort
+      if !get(g:, 'haskell_rebuild_tags', 0)
+        let l:cmd = 'hasktags --ignore-close-implementation --ctags .; sort tags'
+        let g:haskell_rebuild_tags = jobstart(l:cmd, s:HaskellRebuildTagsFinishedHandler)
+      endif
+    endfunction
+
+    augroup haskell_tags
+      au!
+      au BufWritePost *.hs call s:HaskellRebuildTags()
+    augroup end
+
+    command! HaskTags call s:HaskellRebuildTags()
+  endif
+
+  if filereadable('stack.yaml')
+    au VimEnter * call s:HaskellSetup()
+  else
+    HaskEnv current
+  endif
+endfunction

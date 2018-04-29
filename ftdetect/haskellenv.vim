@@ -1,7 +1,7 @@
 augroup haskellenv_commands
-  au BufNewFile,BufRead *.hs runtime haskellenv/haskellenv.vim
+  au BufNewFile,BufRead *.hs call haskellenv#start()
 augroup end
 
 if filereadable('stack.yaml')
-  runtime haskellenv/haskellenv.vim
+  call haskellenv#start()
 endif
