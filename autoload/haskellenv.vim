@@ -1,16 +1,3 @@
-if exists("g:loaded_haskellenv")
-  finish
-endif
-
-let g:loaded_haskellenv = 1
-
-let g:haskell_enable_quantification = 1
-let g:haskell_enable_typeroles = 1
-let g:haskell_enable_pattern_synonyms = 1
-let g:haskell_indent_case_alternative = 1
-
-let g:hamlet_prevent_invalid_nesting = 0
-
 function! s:HaskellHealth(state, resolver)
   if a:state is# 'ide'
     hi LanguageHealth guifg=#B8E673 guibg=#465457
