@@ -254,6 +254,11 @@ function! s:HaskellSkel() abort
 endfunction
 
 function! s:HaskellSettings() abort
+  nnoremap <buffer><silent> ]] :call search('^\(import\)\@![a-z]\+', 'W')<cr>
+  nnoremap <buffer><silent> [[ :call search('^\(import\)\@![a-z]\+', 'bW')<cr>
+  onoremap <buffer><silent> ]] :call search('^\(import\)\@![a-z]\+', 'W')<cr>
+  onoremap <buffer><silent> [[ :call search('^\(import\)\@![a-z]\+', 'bW')<cr>
+
   setlocal suffixesadd+=.hs,.hamlet
 
   if executable('stylish-haskell')
