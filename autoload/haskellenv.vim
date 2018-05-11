@@ -249,14 +249,36 @@ function! s:HaskellSkel() abort
   endif
 endfunction
 
-function! s:NextBlock() abort
+function! s:NextBlockStart() abort
   for i in range(v:count > 1 ? v:count : 1)
-    call search('^\s*$', 'W')
+    let l:line = getline(line('.'))
+    if l:line =~ '^\S'
+      call search('^\s*$', 'W')
+    endif
     call search('^\S', 'W')
   endfor
 endfunction
 
-function! s:PrevBlock() abort
+function! s:NextBlockEnd(inclusive) abort
+  let l:lnum = line('.')
+  call <SID>NextBlockStart()
+  call search('^\s*\S', 'bW')
+  let l:end = line('.')
+  call <SID>PrevBlockStart()
+  let l:start = line('.')
+
+  if !(l:start <= l:lnum && l:lnum < l:end)
+    call cursor(l:lnum, 0)
+    call <SID>NextBlockStart()
+  endif
+  call <SID>NextBlockStart()
+  call search('\S$', 'bW')
+  if a:inclusive
+    call cursor(line('.') + 1, 0)
+  endif
+endfunction
+
+function! s:PrevBlockStart() abort
   for i in range(v:count > 1 ? v:count : 1)
     call search('^\S', 'bW')
     call search('^\s*$', 'bW')
@@ -265,10 +287,10 @@ function! s:PrevBlock() abort
 endfunction
 
 function! s:HaskellSettings() abort
-  nnoremap <buffer><silent> ]] :<C-U>call <SID>NextBlock()<cr>
-  onoremap <buffer><silent> ]] :<C-U>call <SID>NextBlock()<cr>
-  nnoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlock()<cr>
-  onoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlock()<cr>
+  nnoremap <buffer><silent> ]] :<C-U>call <SID>NextBlockStart()<cr>
+  onoremap <buffer><silent> ]] :<C-U>call <SID>NextBlockStart()<cr>
+  nnoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlockStart()<cr>
+  onoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlockStart()<cr>
 
   setlocal suffixesadd+=.hs,.hamlet
 
