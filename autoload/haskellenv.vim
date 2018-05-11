@@ -151,11 +151,7 @@ function! s:HaskellSetup(...) abort
     \ }
 
   function! s:HaskellSetupEnv() abort
-    call s:HaskellHealth('ready', get(g:, 'haskell_resolver', '[unknown]'))
-
-    if &filetype is# 'haskell'
-      call s:HaskellSettings()
-    endif
+    call <SID>HaskellHealth('ready', get(g:, 'haskell_resolver', '[unknown]'))
   endfunction
 
   function! s:HaskellPackagePath(job_id, data, event) abort
@@ -163,9 +159,9 @@ function! s:HaskellSetup(...) abort
 
     if l:path isnot# ''
       let $GHC_PACKAGE_PATH = l:path
-      call s:HaskellHealth('initialized', get(g:, 'haskell_resolver', '[unknown]'))
+      call <SID>HaskellHealth('initialized', get(g:, 'haskell_resolver', '[unknown]'))
 
-      call s:HaskellSetupEnv()
+      call <SID>HaskellSetupEnv()
     endif
   endfunction
   let s:HaskellPackagePathHandler = {
@@ -199,7 +195,7 @@ function! s:HaskellSetup(...) abort
     let l:ghc = a:1
     let l:envpath = $HOME . '/Local/ghc/' . l:ghc . '/bin'
 
-    call s:HaskellHealth('missing', l:ghc)
+    call <SID>HaskellHealth('missing', l:ghc)
 
     "resolve current ghc version
     if l:ghc is# 'current'
@@ -214,7 +210,7 @@ function! s:HaskellSetup(...) abort
 
     if isdirectory(l:envpath)
       let $PATH = l:envpath . ':' . g:haskell_original_path
-      call s:HaskellHealth('ready', l:ghc)
+      call <SID>HaskellHealth('ready', l:ghc)
       call jobstart('ghc --supported-extensions', s:HaskellRegisterExtensionsHandler)
     endif
   else
@@ -227,20 +223,20 @@ function! s:HaskellSetup(...) abort
       let $PATH = l:envpath . ':' . g:haskell_original_path
 
       if l:lts_prefix isnot# '' && isdirectory(l:envpath)
-        call s:HaskellHealth('uninitialized', get(g:, 'haskell_resolver', '[unknown]'))
+        call <SID>HaskellHealth('uninitialized', get(g:, 'haskell_resolver', '[unknown]'))
         if isdirectory($HOME . '/.stack/snapshots/x86_64-freebsd/' . g:haskell_resolver)
           call jobstart('env PATH=' . l:envpath . ':' . g:haskell_original_path . ' stack --no-install-ghc exec printenv PATH', s:HaskellPathHandler)
         endif
       endif
     else
-      call s:HaskellHealth('missing', l:resolver)
+      call <SID>HaskellHealth('missing', l:resolver)
     endif
   endif
 endfunction
 function! s:HaskellEnvs(lead, line, pos) abort
   return system("find ~/Local/ghc -depth 1 -exec basename '{}' + | sort")
 endfunction
-command! -complete=custom,s:HaskellEnvs -nargs=? HaskEnv call s:HaskellSetup(<f-args>)
+command! -complete=custom,<SID>HaskellEnvs -nargs=? HaskEnv call <SID>HaskellSetup(<f-args>)
 
 function! s:HaskellSkel() abort
   if @% is# 'Main.hs'
@@ -273,22 +269,22 @@ endfunction
 function! s:HaskellSortImports(line1, line2)
   exe a:line1 . "," . a:line2 . "sort /import\\s\\+\\(qualified\\s\\+\\)\\?/"
 endfunction
-command! -buffer -range HaskSortImports call s:HaskellSortImports(<line1>, <line2>)
+command! -buffer -range HaskSortImports call <SID>HaskellSortImports(<line1>, <line2>)
 
-function! s:HaskellFormatImport(line1, line2)
+function! <SID>HaskellFormatImport(line1, line2)
   exec a:line1 . ",". a:line2 . "s/import\\s\\+\\([A-Z].*\\)/import           \\1"
 endfunction
-command! -buffer -range HaskFormatImport call s:HaskellFormatImport(<line1>, <line2>)
+command! -buffer -range HaskFormatImport call <SID>HaskellFormatImport(<line1>, <line2>)
 
 function! haskellenv#start()
   augroup haskellenv_commands
     au!
-    au BufNewFile *.hs call s:HaskellSkel() | call s:HaskellSettings()
-    au BufRead *.hs call s:HaskellSettings()
+    au BufNewFile *.hs call <SID>HaskellSkel() | call <SID>HaskellSettings()
+    au BufRead *.hs call <SID>HaskellSettings()
     au BufNewFile,BufRead *.dump-stg,*.dump-simpl setf haskell
     au BufNewFile,BufRead *.dump-cmm,*.dump-opt-cmm setf c
     au BufNewFile,BufRead *.dump-asm setf asm
-    au BufWritePost stack.yaml call s:HaskellSetup()
+    au BufWritePost stack.yaml call <SID>HaskellSetup()
   augroup end
 
   if executable('hasktags')
@@ -308,15 +304,19 @@ function! haskellenv#start()
 
     augroup haskell_tags
       au!
-      au BufWritePost *.hs call s:HaskellRebuildTags()
+      au BufWritePost *.hs call <SID>HaskellRebuildTags()
     augroup end
 
-    command! HaskTags call s:HaskellRebuildTags()
+    command! HaskTags call <SID>HaskellRebuildTags()
   endif
 
   if filereadable('stack.yaml')
-    au VimEnter * call s:HaskellSetup()
+    au VimEnter * call <SID>HaskellSetup()
   else
     HaskEnv current
+  endif
+
+  if &ft == 'haskell'
+    call s:HaskellSettings()
   endif
 endfunction
