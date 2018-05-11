@@ -288,6 +288,18 @@ function! s:PrevBlockStart(count) abort
   endfor
 endfunction
 
+function! s:PrevBlockEnd(count, inclusive) abort
+  for i in range(a:count > 1 ? a:count : 1)
+    call <SID>NextBlockStart(1)
+    call search('\S$', 'bW')
+    call <SID>PrevBlockStart(1)
+    call search('\S$', 'bW')
+    if !a:inclusive
+      call cursor(line('.') + 1, 0)
+    endif
+  endfor
+endfunction
+
 function! s:HaskellSettings() abort
   nnoremap <buffer><silent> ]] :<C-U>call <SID>NextBlockStart(v:count)<cr>
   onoremap <buffer><silent> ]] :<C-U>call <SID>NextBlockStart(v:count)<cr>
@@ -295,7 +307,8 @@ function! s:HaskellSettings() abort
   onoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlockStart(v:count)<cr>
   nnoremap <buffer><silent> ][ :<C-U>call <SID>NextBlockEnd(v:count,0)<cr>
   onoremap <buffer><silent> ][ :<C-U>call <SID>NextBlockEnd(v:count,1)<cr>
-  " nnoremap <buffer><silent> [] :<C-U>call <SID>PrevBlockEnd(0)<cr>
+  nnoremap <buffer><silent> [] :<C-U>call <SID>PrevBlockEnd(v:count,1)<cr>
+  onoremap <buffer><silent> [] :<C-U>call <SID>PrevBlockEnd(v:count,0)<cr>
 
   setlocal suffixesadd+=.hs,.hamlet
 
