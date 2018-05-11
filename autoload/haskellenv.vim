@@ -249,11 +249,26 @@ function! s:HaskellSkel() abort
   endif
 endfunction
 
+function! s:NextBlock() abort
+  for i in range(v:count > 1 ? v:count : 1)
+    call search('^\s*$', 'W')
+    call search('^\S', 'W')
+  endfor
+endfunction
+
+function! s:PrevBlock() abort
+  for i in range(v:count > 1 ? v:count : 1)
+    call search('^\S', 'bW')
+    call search('^\s*$', 'bW')
+    call search('^\S', 'W')
+  endfor
+endfunction
+
 function! s:HaskellSettings() abort
-  nnoremap <buffer><silent> ]] :call search('^\(import\)\@![a-z]\+', 'W')<cr>
-  nnoremap <buffer><silent> [[ :call search('^\(import\)\@![a-z]\+', 'bW')<cr>
-  onoremap <buffer><silent> ]] :call search('^\(import\)\@![a-z]\+', 'W')<cr>
-  onoremap <buffer><silent> [[ :call search('^\(import\)\@![a-z]\+', 'bW')<cr>
+  nnoremap <buffer><silent> ]] :<C-U>call <SID>NextBlock()<cr>
+  onoremap <buffer><silent> ]] :<C-U>call <SID>NextBlock()<cr>
+  nnoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlock()<cr>
+  onoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlock()<cr>
 
   setlocal suffixesadd+=.hs,.hamlet
 
