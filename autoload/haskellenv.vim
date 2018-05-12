@@ -262,9 +262,11 @@ endfunction
 function! s:NextBlockEnd(count, inclusive) abort
   for i in range(a:count > 1 ? a:count : 1)
     let l:lnum = line('.')
+
     call <SID>NextBlockStart(1)
-    call search('^\s*\S', 'bW')
+    call search('\S$', 'bW')
     let l:end = line('.')
+
     call <SID>PrevBlockStart(1)
     let l:start = line('.')
 
@@ -303,6 +305,9 @@ function! s:PrevBlockEnd(count, inclusive) abort
       call <SID>PrevBlockStart(1)
     endif
     call search('\S$', 'bW')
+    if !a:inclusive
+      call cursor(line('.') + 1, 0)
+    endif
   endfor
 endfunction
 
