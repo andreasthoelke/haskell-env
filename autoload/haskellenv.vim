@@ -254,8 +254,9 @@ function! s:Move(m, inclusive, visual)
     exe 'normal ' . visualmode()
     call cursor(line("'>"), col("'>"))
   endif
+  let l:f = 'call <SID>'. a:m . '(' . a:inclusive . ')'
   for i in range(v:count > 1 ? v:count : 1)
-    execute 'call <SID>'. a:m . '(' . a:inclusive . ')'
+    execute l:f
   endfor
 endfunction
 
