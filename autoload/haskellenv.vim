@@ -249,77 +249,83 @@ function! s:HaskellSkel() abort
   endif
 endfunction
 
-function! s:NextBlockStart(count) abort
-  for i in range(a:count > 1 ? a:count : 1)
-    let l:line = getline(line('.'))
-    if l:line =~ '^\S'
-      call search('^\s*$', 'W')
-    endif
-    call search('^\S', 'W')
+function! s:Move(m, inclusive, visual)
+  if a:visual
+    exe 'normal ' . visualmode()
+    call cursor(line("'>"), col("'>"))
+  endif
+  for i in range(v:count > 1 ? v:count : 1)
+    execute 'call <SID>'. a:m . '(' . a:inclusive . ')'
   endfor
 endfunction
 
-function! s:NextBlockEnd(count, inclusive) abort
-  for i in range(a:count > 1 ? a:count : 1)
-    let l:lnum = line('.')
-
-    call <SID>NextBlockStart(1)
-    call search('\S$', 'bW')
-    let l:end = line('.')
-
-    call <SID>PrevBlockStart(1)
-    let l:start = line('.')
-
-    if !(l:start <= l:lnum && l:lnum < l:end)
-      call cursor(l:lnum, 0)
-      call <SID>NextBlockStart(1)
-    endif
-    call <SID>NextBlockStart(1)
-    call search('\S$', 'bW')
-    if a:inclusive
-      call cursor(line('.') + 1, 0)
-    endif
-  endfor
+function! s:NextBlockStart(inclusive) abort
+  let l:line = getline(line('.'))
+  if l:line =~ '^\S'
+    call search('^\s*$', 'W')
+  endif
+  call search('^\S', 'W')
 endfunction
 
-function! s:PrevBlockStart(count) abort
-  for i in range(a:count > 1 ? a:count : 1)
-    call search('^\S', 'bW')
-    call search('^\s*$', 'bW')
-    call search('^\S', 'W')
-  endfor
-endfunction
+function! s:NextBlockEnd(inclusive) abort
+  let l:lnum = line('.')
 
-function! s:PrevBlockEnd(count, inclusive) abort
-  for i in range(a:count > 1 ? a:count : 1)
-    let l:lnum = line('.')
+  call <SID>NextBlockStart(0)
+  call search('\S$', 'bW')
+  let l:end = line('.')
 
-    call <SID>PrevBlockStart(1)
+  call <SID>PrevBlockStart(0)
+  let l:start = line('.')
 
-    call <SID>NextBlockStart(1)
-    call search('\S$', 'bW')
-    let l:end = line('.')
-
+  if !(l:start <= l:lnum && l:lnum < l:end)
     call cursor(l:lnum, 0)
-    if l:lnum <= l:end
-      call <SID>PrevBlockStart(1)
-    endif
-    call search('\S$', 'bW')
-    if !a:inclusive
-      call cursor(line('.') + 1, 0)
-    endif
-  endfor
+    call <SID>NextBlockStart(0)
+  endif
+  call <SID>NextBlockStart(0)
+  call search('\S$', 'bW')
+  if a:inclusive
+    call cursor(line('.') + 1, 0)
+  endif
+endfunction
+
+function! s:PrevBlockStart(inclusive) abort
+  call search('^\S', 'bW')
+  call search('^\s*$', 'bW')
+  call search('^\S', 'W')
+endfunction
+
+function! s:PrevBlockEnd(inclusive) abort
+  let l:lnum = line('.')
+
+  call <SID>PrevBlockStart(0)
+
+  call <SID>NextBlockStart(0)
+  call search('\S$', 'bW')
+  let l:end = line('.')
+
+  call cursor(l:lnum, 0)
+  if l:lnum <= l:end
+    call <SID>PrevBlockStart(0)
+  endif
+  call search('\S$', 'bW')
+  if !a:inclusive
+    call cursor(line('.') + 1, 0)
+  endif
 endfunction
 
 function! s:HaskellSettings() abort
-  nnoremap <buffer><silent> ]] :<C-U>call <SID>NextBlockStart(v:count)<cr>
-  onoremap <buffer><silent> ]] :<C-U>call <SID>NextBlockStart(v:count)<cr>
-  nnoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlockStart(v:count)<cr>
-  onoremap <buffer><silent> [[ :<C-U>call <SID>PrevBlockStart(v:count)<cr>
-  nnoremap <buffer><silent> ][ :<C-U>call <SID>NextBlockEnd(v:count,0)<cr>
-  onoremap <buffer><silent> ][ :<C-U>call <SID>NextBlockEnd(v:count,1)<cr>
-  nnoremap <buffer><silent> [] :<C-U>call <SID>PrevBlockEnd(v:count,1)<cr>
-  onoremap <buffer><silent> [] :<C-U>call <SID>PrevBlockEnd(v:count,0)<cr>
+  nnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',0,0)<cr>
+  onoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',0,0)<cr>
+  vnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',0,1)<cr>
+  nnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',0,0)<cr>
+  onoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',0,0)<cr>
+  vnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',0,1)<cr>
+  nnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',0,0)<cr>
+  onoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',1,0)<cr>
+  vnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',0,1)<cr>
+  nnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',1,0)<cr>
+  onoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',0,0)<cr>
+  vnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',1,1)<cr>
 
   setlocal suffixesadd+=.hs,.hamlet
 
