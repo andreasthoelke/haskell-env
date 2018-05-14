@@ -249,12 +249,15 @@ function! s:HaskellSkel() abort
   endif
 endfunction
 
-function! s:Move(m, inclusive, visual)
+function! s:Move(m, count, inclusive, visual, jump)
+  if a:jump
+    normal! m'
+  endif
   if a:visual
-    normal gv
+    normal! gv
   endif
   let l:f = 'call <SID>'. a:m . '(' . a:inclusive . ')'
-  for i in range(v:count > 1 ? v:count : 1)
+  for i in range(a:count > 1 ? a:count : 1)
     execute l:f
   endfor
 endfunction
@@ -314,18 +317,20 @@ function! s:PrevBlockEnd(inclusive) abort
 endfunction
 
 function! s:HaskellSettings() abort
-  nnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',0,0)<cr>
-  onoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',0,0)<cr>
-  vnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',0,1)<cr>
-  nnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',0,0)<cr>
-  onoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',0,0)<cr>
-  vnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',0,1)<cr>
-  nnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',0,0)<cr>
-  onoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',1,0)<cr>
-  vnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',0,1)<cr>
-  nnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',1,0)<cr>
-  onoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',0,0)<cr>
-  vnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',1,1)<cr>
+  nnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',v:count,0,0,1)<cr>
+  nnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,1,0,1)<cr>
+  nnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,0,0,1)<cr>
+  nnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,0,0,1)<cr>
+
+  vnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',v:count,0,1,0)<cr>
+  vnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,1,1,0)<cr>
+  vnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,0,1,0)<cr>
+  vnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,0,1,0)<cr>
+
+  onoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',v:count,0,0,0)<cr>
+  onoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,0,0,0)<cr>
+  onoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,1,0,0)<cr>
+  onoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,0,0,0)<cr>
 
   setlocal suffixesadd+=.hs,.hamlet
 
