@@ -251,8 +251,7 @@ endfunction
 
 function! s:Move(m, inclusive, visual)
   if a:visual
-    exe 'normal ' . visualmode()
-    call cursor(line("'>"), col("'>"))
+    normal gv
   endif
   let l:f = 'call <SID>'. a:m . '(' . a:inclusive . ')'
   for i in range(v:count > 1 ? v:count : 1)
