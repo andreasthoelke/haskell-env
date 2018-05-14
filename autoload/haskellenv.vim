@@ -272,14 +272,11 @@ endfunction
 
 function! s:NextBlockEnd(inclusive) abort
   let l:lnum = line('.')
-
   call <SID>NextBlockStart(0)
   call search('\S$', 'bW')
   let l:end = line('.')
-
   call <SID>PrevBlockStart(0)
   let l:start = line('.')
-
   if !(l:start <= l:lnum && l:lnum < l:end)
     call cursor(l:lnum, 0)
     call <SID>NextBlockStart(0)
@@ -299,13 +296,10 @@ endfunction
 
 function! s:PrevBlockEnd(inclusive) abort
   let l:lnum = line('.')
-
   call <SID>PrevBlockStart(0)
-
   call <SID>NextBlockStart(0)
   call search('\S$', 'bW')
   let l:end = line('.')
-
   call cursor(l:lnum, 0)
   if l:lnum <= l:end
     call <SID>PrevBlockStart(0)
