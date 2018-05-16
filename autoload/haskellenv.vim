@@ -265,9 +265,11 @@ endfunction
 function! s:NextBlockStart(inclusive) abort
   let l:line = getline(line('.'))
   if l:line =~ '^\S'
-    call search('^\s*$', 'W')
+    call search('^\s*$\|\%$', 'W')
   endif
-  call search('^\S', 'W')
+  if line('.') != 1
+    call search('^\S', 'W')
+  endif
 endfunction
 
 function! s:NextBlockEnd(inclusive) abort
@@ -290,8 +292,10 @@ endfunction
 
 function! s:PrevBlockStart(inclusive) abort
   call search('^\S', 'bW')
-  call search('^\s*$', 'bW')
-  call search('^\S', 'W')
+  call search('^\s*$\|\%^', 'bW')
+  if line('.') != 1
+    call search('^\S', 'W')
+  endif
 endfunction
 
 function! s:PrevBlockEnd(inclusive) abort
