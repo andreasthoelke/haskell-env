@@ -304,11 +304,11 @@ function! s:PrevBlockEnd(inclusive) abort
   call <SID>NextBlockStart(0)
   call search('\S$', 'bW')
   let l:end = line('.')
-  call cursor(l:lnum, 0)
   if l:lnum <= l:end
+    call cursor(l:lnum, 0)
     call <SID>PrevBlockStart(0)
+    call search('\S$', 'bW')
   endif
-  call search('\S$', 'bW')
   if !a:inclusive
     call cursor(line('.') + 1, 0)
   endif
