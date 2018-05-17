@@ -299,16 +299,20 @@ endfunction
 function! s:PrevBlockEnd(inclusive) abort
   let l:lstart = line('.')
   call <SID>PrevBlockStart(0)
-  call <SID>NextBlockStart(0)
-  call search('\S$', 'bW')
-  let l:lend = line('.')
-  if l:lstart <= l:lend
-    call cursor(l:lstart, 0)
-    call <SID>PrevBlockStart(0)
+  if l:lstart == line('$') && indent(line('$')) == 0
     call search('\S$', 'bW')
-  endif
-  if !a:inclusive
-    call cursor(line('.') + 1, 0)
+  else
+    call <SID>NextBlockStart(0)
+    call search('\S$', 'bW')
+    let l:lend = line('.')
+    if l:lstart <= l:lend
+      call cursor(l:lstart, 0)
+      call <SID>PrevBlockStart(0)
+      call search('\S$', 'bW')
+    endif
+    if !a:inclusive
+      call cursor(line('.') + 1, 0)
+    endif
   endif
 endfunction
 
