@@ -270,20 +270,21 @@ function! s:NextBlockStart(inclusive) abort
 endfunction
 
 function! s:NextBlockEnd(inclusive) abort
-  let l:lnum = line('.')
+  let l:lstart = line('.')
+  let l:cstart = col('.')
   call <SID>NextBlockStart(0)
-  call search('\S$', 'bW')
-  let l:end = line('.')
-  call <SID>PrevBlockStart(0)
-  let l:start = line('.')
-  if !(l:start <= l:lnum && l:lnum < l:end)
-    call cursor(l:lnum, 0)
-    call <SID>NextBlockStart(0)
-  endif
-  call <SID>NextBlockStart(0)
-  call search('\S$', 'bW')
-  if a:inclusive
-    call cursor(line('.') + 1, 0)
+  if line('.') != line('$')
+    call search('\S$', 'bW')
+    let l:lend = line('.')
+    let l:cend = col('.')
+
+    if l:lstart == l:lend && l:cstart == l:cend
+      call <SID>NextBlockStart(0)
+      call <SID>NextBlockStart(0)
+      if line('.') != line('$')
+        call search('\S$', 'bW')
+      endif
+    endif
   endif
 endfunction
 
