@@ -351,10 +351,10 @@ function! s:HaskellSettings() abort
   onoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,0,0)<cr>
   onoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,0,0)<cr>
 
-  onoremap <buffer> iB :<C-U>call <SID>Block('NextBlockEnd',v:count,0)<cr>
-  onoremap <buffer> aB :<C-U>call <SID>Block('NextBlockStart',v:count,0)<cr>
-  vnoremap <buffer> iB :<C-U>call <SID>Block('NextBlockEnd',v:count,1)<cr>
-  vnoremap <buffer> aB :<C-U>call <SID>Block('NextBlockStart',v:count,1)<cr>
+  onoremap <buffer><silent> iB :<C-U>call <SID>Block('NextBlockEnd',v:count,0)<cr>
+  onoremap <buffer><silent> aB :<C-U>call <SID>Block('NextBlockStart',v:count,0)<cr>
+  vnoremap <buffer><silent> iB :<C-U>call <SID>Block('NextBlockEnd',v:count,1)<cr>
+  vnoremap <buffer><silent> aB :<C-U>call <SID>Block('NextBlockStart',v:count,1)<cr>
 
   setlocal suffixesadd+=.hs,.hamlet
 
