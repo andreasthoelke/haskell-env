@@ -312,6 +312,28 @@ function! s:PrevBlockEnd() abort
   endif
 endfunction
 
+function! s:Block(til, count, visual)
+  let l:line = line('.')
+  call <SID>PrevBlockStart()
+  call <SID>NextBlockStart()
+  if line('.') > l:line
+    call <SID>PrevBlockStart()
+  endif
+  execute 'normal! ' . (a:visual ? visualmode() : 'v')
+  let l:f = 'call <SID>' . a:til . '()'
+  let l:around = a:til is# 'NextBlockStart'
+  for i in range(a:count > 1 ? a:count : 1)
+    execute l:f
+    if line('.') != line('$')
+      if l:around
+        normal! k
+      elseif !a:visual
+        normal! k$
+      endif
+    endif
+  endfor
+endfunction
+
 function! s:HaskellSettings() abort
   nnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',v:count,0,1)<cr>
   nnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,0,1)<cr>
@@ -327,6 +349,11 @@ function! s:HaskellSettings() abort
   onoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,0,0)<cr>
   onoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,0,0)<cr>
   onoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,0,0)<cr>
+
+  onoremap <buffer> iB :<C-U>call <SID>Block('NextBlockEnd',v:count,0)<cr>
+  onoremap <buffer> aB :<C-U>call <SID>Block('NextBlockStart',v:count,0)<cr>
+  vnoremap <buffer> iB :<C-U>call <SID>Block('NextBlockEnd',v:count,1)<cr>
+  vnoremap <buffer> aB :<C-U>call <SID>Block('NextBlockStart',v:count,1)<cr>
 
   setlocal suffixesadd+=.hs,.hamlet
 
