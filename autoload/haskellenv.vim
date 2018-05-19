@@ -263,7 +263,8 @@ function! s:Move(m, count, visual, jump)
 endfunction
 
 function! s:NextBlockStart() abort
-  if indent(line('.')) == 0
+  let l:line = line('.')
+  if indent(l:line) == 0 && getline(l:line) isnot# ''
     call search('^\s*$\|\%$', 'W')
   endif
   call search('^\S', 'W')
