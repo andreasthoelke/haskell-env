@@ -386,6 +386,9 @@ function! haskellenv#start()
     au BufNewFile,BufRead *.dump-cmm,*.dump-opt-cmm setf c
     au BufNewFile,BufRead *.dump-asm setf asm
     au BufWritePost stack.yaml call <SID>HaskellSetup()
+    if filereadable('stack.yaml')
+      au VimEnter * call <SID>HaskellSetup()
+    endif
   augroup end
 
   if executable('hasktags')
@@ -403,16 +406,14 @@ function! haskellenv#start()
       endif
     endfunction
 
-    augroup haskell_tags
-      au!
-      au BufWritePost *.hs call <SID>HaskellRebuildTags()
-    augroup end
-
     command! HaskTags call <SID>HaskellRebuildTags()
   endif
 
   if filereadable('stack.yaml')
-    au VimEnter * call <SID>HaskellSetup()
+    augroup haskell_tags
+      au!
+      au BufWritePost *.hs call <SID>HaskellRebuildTags()
+    augroup end
   else
     HaskEnv current
   endif
