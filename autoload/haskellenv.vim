@@ -136,6 +136,7 @@ endfunction
 set omnifunc=HaskellComplete
 
 function! s:HaskellSetup(...) abort
+  let $GHC_PACKAGE_PATH = ''
   let g:haskell_original_path = get(g:, 'haskell_original_path', $PATH)
   let g:haskell_supported_extensions = []
 
