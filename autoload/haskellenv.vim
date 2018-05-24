@@ -262,6 +262,24 @@ function! s:Move(m, count, visual, jump)
   endfor
 endfunction
 
+function! s:Method(dir) abort
+  call search('\(^\s*\<data\>\)\@!\&\(^\s*\<type\>\)\@!\&\(^\s\+\<let\>\)\@!\&^\s*[a-z].\{-}=', a:dir . 'W')
+  norm! ^
+endfunction
+
+function! s:NextMethod() abort
+  call <SID>Method('')
+endfunction
+
+function! s:PrevMethod() abort
+  let l:line = line('.')
+  call <SID>Method('b')
+  if line('.') == l:line
+    norm! k
+    call <SID>Method('b')
+  end
+endfunction
+
 function! s:NextBlockStart() abort
   let l:line = line('.')
   if indent(l:line) == 0 && getline(l:line) isnot# ''
@@ -340,16 +358,22 @@ function! s:HaskellSettings() abort
   nnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,0,1)<cr>
   nnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,0,1)<cr>
   nnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,0,1)<cr>
+  nnoremap <buffer><silent> [m :<C-U>call <SID>Move('PrevMethod',v:count,0,1)<cr>
+  nnoremap <buffer><silent> ]m :<C-U>call <SID>Move('NextMethod',v:count,0,1)<cr>
 
   vnoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',v:count,1,0)<cr>
   vnoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,1,0)<cr>
   vnoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,1,0)<cr>
   vnoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,1,0)<cr>
+  vnoremap <buffer><silent> [m :<C-U>call <SID>Move('PrevMethod',v:count,1,0)<cr>
+  vnoremap <buffer><silent> ]m :<C-U>call <SID>Move('NextMethod',v:count,1,0)<cr>
 
   onoremap <buffer><silent> [[ :<C-U>call <SID>Move('PrevBlockStart',v:count,0,0)<cr>
   onoremap <buffer><silent> [] :<C-U>call <SID>Move('PrevBlockEnd',v:count,0,0)<cr>
   onoremap <buffer><silent> ][ :<C-U>call <SID>Move('NextBlockEnd',v:count,0,0)<cr>
   onoremap <buffer><silent> ]] :<C-U>call <SID>Move('NextBlockStart',v:count,0,0)<cr>
+  onoremap <buffer><silent> [m :<C-U>call <SID>Move('PrevMethod',v:count,0,0)<cr>
+  onoremap <buffer><silent> ]m :<C-U>call <SID>Move('NextMethod',v:count,0,0)<cr>
 
   onoremap <buffer><silent> iB :<C-U>call <SID>Block('NextBlockEnd',v:count,0)<cr>
   onoremap <buffer><silent> aB :<C-U>call <SID>Block('NextBlockStart',v:count,0)<cr>
