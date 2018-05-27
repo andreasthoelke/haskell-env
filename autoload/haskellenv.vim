@@ -264,20 +264,16 @@ endfunction
 
 function! s:Method(dir) abort
   call search('^\s*\(\(\<data\>\)\@!\&\(\<type\>\)\@!\&\(\<newtype\>\)\@!\&[a-z].\{-}=\)', a:dir . 'W')
-  norm! ^
 endfunction
 
 function! s:NextMethod() abort
   call <SID>Method('')
+  norm! ^
 endfunction
 
 function! s:PrevMethod() abort
-  let l:line = line('.')
+  norm! 0
   call <SID>Method('b')
-  if line('.') == l:line
-    norm! k
-    call <SID>Method('b')
-  end
 endfunction
 
 function! s:NextBlockStart() abort
