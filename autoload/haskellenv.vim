@@ -274,6 +274,7 @@ endfunction
 function! s:PrevMethod() abort
   norm! 0
   call <SID>Method('b')
+  norm! ^
 endfunction
 
 function! s:NextBlockStart() abort
