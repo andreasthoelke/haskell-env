@@ -263,7 +263,7 @@ function! s:Move(m, count, visual, jump)
 endfunction
 
 function! s:Method(dir) abort
-  call search('^\s*\(\(\<data\>\)\@!\&\(\<type\>\)\@!\&\(\<newtype\>\)\@!\&[a-z].\{-}=\)', a:dir . 'W')
+  call search('^\s*\(\(\<data\>\)\@!\&\(\<type\>\)\@!\&\(\<newtype\>\)\@!\&\([a-z]\|([-!#$%&\*\+/<=>\?@\\^|~:.]\+)\).\{-}\s=\)', a:dir . 'W')
 endfunction
 
 function! s:NextMethod() abort
