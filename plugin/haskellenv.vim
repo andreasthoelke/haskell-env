@@ -11,3 +11,5 @@ augroup end
 if filereadable('stack.yaml')
   call haskellenv#start()
 endif
+
+" test changes
